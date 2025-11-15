@@ -2,6 +2,7 @@
 import json
 import os
 from bn_model import build_disruption_cpt, save_cpt_csv, infer_pure_python
+from visualize_bn import draw_bn
 
 def pretty_print_post(post):
     print("Posterior DisruptionRisk:")
@@ -23,6 +24,7 @@ def main():
     with open('outputs/posterior_example.json', 'w') as f:
         json.dump({'evidence': evidence, 'posterior': posterior}, f, indent=2)
     print("Saved posterior to outputs/posterior_example.json")
+    draw_bn(path='outputs/bn_diagram.png')
 
 if __name__ == "__main__":
     main()

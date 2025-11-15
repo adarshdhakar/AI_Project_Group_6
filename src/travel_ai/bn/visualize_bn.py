@@ -4,6 +4,7 @@ import networkx as nx
 import os
 
 def draw_bn(path='outputs/bn_diagram.png'):
+    print("Drawing Bayesian Network diagram...")
     G = nx.DiGraph()
     parents = ['Weather','HistoryDelay','Congestion','Festival']
     for p in parents:
