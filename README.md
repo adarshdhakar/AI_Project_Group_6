@@ -9,5 +9,5 @@ venv\Scripts\activate
 
 pip install -r requirements.txt
 
+python src/travel_ai/bn/bn_examples.py
 ```
-python src/travel_ai/bn/bn_model.py
