@@ -1,7 +1,7 @@
 # src/travel_ai/bn/bn_examples.py
 import json
 import os
-from bn_model import build_disruption_cpt, save_cpt_csv, infer_pure_python
+from bn_model import build_disruption_cpt, save_cpt_csv, infer_pure_python, build_pgmpy_model
 from visualize_bn import draw_bn
 
 def pretty_print_post(post):
@@ -12,6 +12,8 @@ def pretty_print_post(post):
 def main():
     cpt = build_disruption_cpt()
     save_cpt_csv(cpt, path='outputs/disruption_cpt.csv')
+    draw_bn(path='outputs/bn_diagram.png')
+
 
     # Non-trivial test case (realistic): severe weather, high history delay, high congestion, no festival
     evidence = {'Weather':2,'HistoryDelay':1,'Congestion':1,'Festival':0}
@@ -24,7 +26,6 @@ def main():
     with open('outputs/posterior_example.json', 'w') as f:
         json.dump({'evidence': evidence, 'posterior': posterior}, f, indent=2)
     print("Saved posterior to outputs/posterior_example.json")
-    draw_bn(path='outputs/bn_diagram.png')
 
 if __name__ == "__main__":
     main()
