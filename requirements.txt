@@ -3,3 +3,4 @@ matplotlib==3.10.7
 networkx==3.5
 numpy==2.3.4
 pgmpy==1.0.0
+streamlit==1.51.0
