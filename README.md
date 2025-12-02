@@ -11,3 +11,10 @@ pip install -r requirements.txt
 
 python src/travel_ai/bn/bn_examples.py
 ```
+
+
+python app.py
+
+python -m streamlit run app,py
+python app.py
+streamlit run app.py
