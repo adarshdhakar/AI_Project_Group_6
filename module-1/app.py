@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Bayesian Disruption Risk Estimation (fixed for pgmpy v1.0.0 behavior)
-"""
-
 import itertools
 import json
 import math
