@@ -119,19 +119,51 @@ README.md
 requirements.txt
 ```
 
-## Contributors
+## Contribution List
 
-- Module 1 : Suprit Naik (22CS01018), Adarsh Dhakar (22CS01040)
-- Module 2 : Sayali Khamitkar (22CS01052), Sai Nikita Palisetty (22CS01050)
-- Module 3 : Suprit Naik (22CS01018), Om Prakash Behera (22CS01040)
-- Module 4 : Soham Jain (22CS01007), Anshul (22CS01009), Harshil Singh (22CS01015)
-- Module 5 : Adarsh Dhakar (22CS01040), Kumar Utkarsh (22CS01032)
+### Module-wise Contributors
+
+* **Module 1 (Bayesian Risk Estimation)**
+
+  * Suprit Naik (22CS01018)
+  * Adarsh Dhakar (22CS01040)
+
+* **Module 2 (Search-Based Multi-Modal Route Exploration)**
+
+  * Sayali Khamitkar (22CS01052)
+  * Sai Nikita Palisetty (22CS01050)
+
+* **Module 3 (GraphPlan & POP Planning)**
+
+  * Suprit Naik (22CS01018)
+  * Om Prakash Behera (22CS01041)
+
+* **Module 4 (Reinforcement Learning – MDP & Q-Learning)**
+
+  * Soham Jain (22CS01007)
+  * Anshul (22CS01009)
+  * Harshil Singh (22CS01015)
+
+* **Module 5 (LLM-Based Traveler Advisory)**
+
+  * Adarsh Dhakar (22CS01040)
+  * Kumar Utkarsh (22CS01032)
 
 ## Team Members
 
-Soham Jain (22CS01007)
-Anshul (22CS01009)
-Harshil Singh (22CS01015)
-Suprit Naik (22CS01018)
-Adarsh Dhakar (22CS01040)
-Om Prakash Behera (22CS01040)
+* Soham Jain (22CS01007)
+* Anshul (22CS01009)
+* Harshil Singh (22CS01015)
+* Suprit Naik (22CS01018)
+* Kumar Utkarsh (22CS01032)
+* Adarsh Dhakar (22CS01040)
+* Om Prakash Behera (22CS01041)
+* Sai Nikita Palisetty (22CS01050)
+* Sayali Khamitkar (22CS01052)
+
+
+
+
+
+
+
