@@ -1,4 +1,4 @@
-# app.py (enhanced)
+# app.py 
 import streamlit as st
 import graphviz
 import itertools
@@ -8,7 +8,7 @@ from collections import defaultdict
 st.set_page_config(page_title="GraphPlan (Travel) — Interactive Prototype", layout="wide")
 
 # ------------------------------
-# Action model (extended)
+# Action model 
 # ------------------------------
 class Action:
     def __init__(self, name, pre=None, add=None, delete=None, noop=False, cost=0, duration=0, risk_estimate=0.0):
@@ -26,7 +26,7 @@ class Action:
         return f"Action({self.name})"
 
 # ------------------------------
-# Travel domain (add cost/duration/risk)
+# Travel domain 
 # ------------------------------
 ACTIONS = [
     Action("CheckWeather", pre=["At(Home)"], add=["WeatherChecked"], cost=1, duration=5, risk_estimate=0.01),
@@ -100,7 +100,7 @@ if "literal_levels" not in st.session_state:
     st.session_state.failed_actions = set()  # temporarily unavailable actions (simulate disruptions)
 
 # ------------------------------
-# Expand one GraphPlan level (unchanged, but keeps risk fields separate)
+# Expand one GraphPlan level
 # ------------------------------
 def expand_next_level():
     if st.session_state.goal_reached:
@@ -110,7 +110,6 @@ def expand_next_level():
     curr_S = st.session_state.literal_levels[-1]
     prev_literal_mutex = st.session_state.mutex_literal_levels[-1]
 
-    # candidate actions: real + no-op whose pre are satisfied
     possible_actions = []
     for a in ACTIONS:
         if a.pre <= curr_S:
@@ -126,7 +125,6 @@ def expand_next_level():
 
     st.session_state.action_levels.append(possible_actions)
 
-    # compute action mutexes
     amutex = set()
     for a, b in itertools.combinations(possible_actions, 2):
         if action_mutex(a, b, prev_literal_mutex):
@@ -134,7 +132,6 @@ def expand_next_level():
             amutex.add((b.name, a.name))
     st.session_state.mutex_action_levels.append(amutex)
 
-    # producers for next S
     producers = {}
     next_S = set()
     for a in possible_actions:
@@ -149,7 +146,6 @@ def expand_next_level():
     st.session_state.producers_levels.append(producers)
     st.session_state.literal_levels.append(next_S)
 
-    # compute literal mutex
     lmutex = set()
     for p in list(next_S):
         if p.startswith("¬"):
@@ -179,7 +175,6 @@ def expand_next_level():
     st.session_state.mutex_literal_levels.append(lmutex)
     st.session_state.level += 1
 
-    # check goal presence
     if GOALS <= next_S:
         goal_mutex_conflict = False
         for g1, g2 in itertools.combinations(GOALS, 2):
@@ -190,7 +185,7 @@ def expand_next_level():
             st.session_state.goal_reached = True
 
 # ------------------------------
-# GraphPlan extraction (POP-like): backtracking
+# GraphPlan extraction : backtracking
 # ------------------------------
 def extract_plan(level_index):
     """
@@ -200,7 +195,7 @@ def extract_plan(level_index):
     This uses producers_levels[level] mapping from literal -> producing actions at level-1.
     """
     K = level_index
-    # recursion cache
+
     cache = {}
 
     def extract(goals, k):
@@ -215,34 +210,28 @@ def extract_plan(level_index):
             else:
                 cache[key] = None
                 return None
-        # find producers at level k: producers_levels[k] is mapping for S_k from actions in A_{k-1}
+        
         prods = st.session_state.producers_levels[k]
         A_prev = st.session_state.action_levels[k-1] if k-1 < len(st.session_state.action_levels) else []
         action_names = {a.name: a for a in A_prev}
-        # For each goal, gather candidate actions that produce it and are not failed
+      
         goal_candidates = {}
         for g in goals:
             cand = set()
             for a_name in prods.get(g, set()):
-                # skip INIT
                 if a_name == "INIT":
-                    # if literal already present in S_{k-1} we don't need an action maybe - but model treat INIT as supported
                     continue
                 if a_name in st.session_state.failed_actions:
                     continue
-                # confirm a_name exists in action_levels[k-1]
                 if a_name in action_names:
                     cand.add(a_name)
-            # if literal present in previous literal level (persisted), allow "no op via INIT" (i.e., empty requirement)
             if g in st.session_state.literal_levels[k-1]:
-                cand.add("INIT")  # special marker meaning no action needed
+                cand.add("INIT")  
             if not cand:
                 cache[key] = None
                 return None
             goal_candidates[g] = cand
 
-        # Backtracking: pick one producer per goal producing a set of actions with no pairwise mutex
-        # We'll create a list of goals and try combinations (cartesian product with pruning)
         goals_list = list(goal_candidates.keys())
         chosen = []
 

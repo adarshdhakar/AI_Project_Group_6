@@ -144,9 +144,6 @@ def make_disruption_cpd():
 
 cpd_disruption = make_disruption_cpd()
 
-# ----------------------------
-# Add CPDs and validate
-# ----------------------------
 model.add_cpds(cpd_weather, cpd_hist, cpd_fest, cpd_congestion, cpd_disruption)
 if not model.check_model():
     raise RuntimeError("Model validation failed (CPD shapes/evidence mismatch).")
@@ -169,9 +166,6 @@ def draw_bn_graph(model, filename="bn_structure.png"):
 
 draw_bn_graph(model, filename="bn_structure.png")
 
-# ----------------------------
-# Pretty print CPTs (same as before)
-# ----------------------------
 def print_some_cpts():
     print("\n=== Prior: Weather CPT ===")
     pprint(cpd_weather.get_values().tolist())
@@ -210,7 +204,7 @@ def print_some_cpts():
 print_some_cpts()
 
 # ----------------------------
-# Inference (fixed)
+# Inference 
 # ----------------------------
 infer = VariableElimination(model)
 
@@ -287,9 +281,6 @@ def run_examples():
 
 run_examples()
 
-# ----------------------------
-# Explanation and export
-# ----------------------------
 def explain_results():
     print("\n=== Explanation of results & caveats ===")
     print("See script comments for details. CPT generation was parametric; tune weights/thresholds to match data.")
@@ -315,7 +306,6 @@ def export_cpts_json(filename="bn_cpts.json"):
         }
         out[var] = cpddict
 
-    # safe recursive converter (extra safety)
     def make_serializable(obj):
         if isinstance(obj, np.ndarray):
             return obj.tolist()

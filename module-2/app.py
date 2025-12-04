@@ -15,12 +15,12 @@ class Edge:
         self.mode = mode
 
         # base attributes
-        self.base_time = float(base_time)          # nominal time
+        self.base_time = float(base_time)          
         self.base_cost = float(base_cost)
 
         # disruption parameters
-        self.delay_prob = float(delay_p)           # probability of delay
-        self.delay_extra = float(delay_extra)      # expected delay duration
+        self.delay_prob = float(delay_p)           
+        self.delay_extra = float(delay_extra)      
 
         # qualitative factors
         self.comfort = float(comfort)
@@ -32,7 +32,6 @@ class Edge:
         return self.base_time + self.delay_prob * self.delay_extra
 
     def clone(self):
-       #copy of edges so that the original graph stays intact
         return Edge(self.src, self.dst, self.mode, self.base_time,
                     self.base_cost, self.delay_prob, self.delay_extra,
                     self.comfort, self.safety, self.info)
@@ -61,7 +60,6 @@ class MultiModalGraph:
 
     def apply_disruption(self, src, dst, mode=None,
                           new_delay_prob=None, new_extra_delay=None, scale_time=None):
-      #modifying the disrupted edges
         for e in self.edges.get(src, []):
             if e.dst == dst and (mode is None or e.mode == mode):
                 if new_delay_prob is not None:
@@ -111,14 +109,12 @@ def ucs(graph, start, goal, weights):
     while pq:
         g_cost, node, parent, edge_used = heappop(pq)
 
-        # prune suboptimal entries
-        if node in visited and g_cost > visited[node][0] + 1e-12:   # to consider the floating point precision
+        if node in visited and g_cost > visited[node][0] + 1e-12:
             continue
 
         visited[node] = (g_cost, parent, edge_used)
 
         if node == goal:
-            # reconstruct optimal route
             route = []
             cur = node
             while visited[cur][2] is not None:
@@ -143,7 +139,6 @@ def ucs(graph, start, goal, weights):
 
 def get_min_time_to_goal(graph, goal):
 
-    # Reverse Dijkstra to compute the minimal base_time need to reach the goal from every node, this is used as a heuristic for A*
     times = {n: math.inf for n in graph.nodes()}
     times[goal] = 0.0
 
@@ -171,8 +166,6 @@ def get_min_time_to_goal(graph, goal):
 # ========================================
 
 def a_star(graph, start, goal, weights):
-    # A* search using w_time * minimal_travel_time heuristic.
-    # The heuristic used here is admissible so never over-estimates the cost and hence always finds the optimal path
     min_time = get_min_time_to_goal(graph, goal)
 
     def h(n):
@@ -210,11 +203,6 @@ def a_star(graph, start, goal, weights):
                          (new_g + h(e.dst), new_g, e.dst, node, e.clone()))
 
     return None, math.inf
-
-
-# ========================================
-# 6. Demo Graph + Execution
-# ========================================
 
 def build_graph_demo():
     g = MultiModalGraph()
@@ -263,8 +251,7 @@ def describe_route(path):
 def main():
     g = build_graph_demo()
     start, goal = "A", "E"
-
-    # multi-factor weights
+    
     W = {
         "time": 1.0,
         "money": 0.5,
