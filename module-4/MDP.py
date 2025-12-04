@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Travel Planning MDP with disruptions, urgency, and remaining cost.
 """
@@ -15,7 +13,6 @@ progress_states = ["NOT_STARTED", "EN_ROUTE", "ARRIVED", "CANCELLED"]
 disruption_states = ["NONE", "DELAY", "CANCEL"]
 urgency_levels = ["LOW", "MEDIUM", "HIGH"]
 
-# Build full state-space as tuples
 states = []
 for p in progress_states:
     for d in disruption_states:
@@ -30,18 +27,14 @@ actions = ["ConfirmRoute", "SwitchRoute", "Wait", "CancelAndRebook"]
 # -------------------------------------------------------
 
 def clamp_cost(cost):
-    # Valid discrete cost levels
     levels = [0, 20, 40, 60, 80, 100]
 
-    # If cost is below 0 → clamp to 0
     if cost <= 0:
         return 0
 
-    # If above max → clamp to 100
     if cost >= 100:
         return 100
 
-    # Otherwise snap to nearest level
     return min(levels, key=lambda x: abs(x - cost))
 
 
@@ -123,7 +116,7 @@ def transitions(state, action):
 
 
 # -------------------------------------------------------
-# Policy Evaluation (same as your previous code)
+# Policy Evaluation 
 # -------------------------------------------------------
 
 def policy_evaluation(policy, gamma=1.0, theta=1e-6, max_iterations=100):

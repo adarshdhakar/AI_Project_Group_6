@@ -1,4 +1,3 @@
-# app.py
 """
 LLM-Based Traveler Advisory and Explanation Generation (Gemini)
 - Streamlit app that builds a prompt from a user-provided itinerary + context,
@@ -53,9 +52,6 @@ Instructions:
 Given the context and the final recommended plan above, write a traveler-facing advisory following the System rules.
 """
 
-# ---------------------------
-# Gemini call wrapper
-# ---------------------------
 def gemini_generate_explanation(plan_text: str,
                                  preferences: str,
                                  constraints: str,
@@ -79,18 +75,14 @@ def gemini_generate_explanation(plan_text: str,
 
 
     try:
-        # Use the provided API key for client initialization
-        # Set environment variables for the SDK to pick up
         os.environ["GEMINI_API_KEY"] = api_key
         os.environ["GOOGLE_API_KEY"] = api_key
 
-        # Standard modern way to initialize the client
         if hasattr(gemini_client_module, "Client"):
             client = gemini_client_module.Client(api_key=api_key)
             resp = client.models.generate_content(model=model, contents=full_prompt)
             content = getattr(resp, "text", None) or str(resp)
             
-        # Fallback for older SDK versions
         elif hasattr(gemini_client_module, "configure"):
             gemini_client_module.configure(api_key=api_key)
             if hasattr(gemini_client_module, "generate_content"):
@@ -141,11 +133,6 @@ with col2:
     # --- GET KEY FROM GIT / ENV ---
     git_key = "AIzaSyAVcJXuZWOWr53gvMbZU9h9KKTbU7ruZWQ"
 
-    # -------- API KEY HANDLING (CORRECTED) --------
-    # The original hardcoded key was a placeholder. 
-    # To run this, a *real* key must be supplied. We will check the env/git first.
-    
-    # Check if a key was found from git/env, otherwise, prompt user.
     if git_key:
         api_key_source = f"Key found from environment/git config ({git_key[:4]}...)."
         api_key = git_key
@@ -170,16 +157,13 @@ with col2:
 
     generate_btn = st.button("Generate Explanation")
 
-# Parse metadata
 try:
     segment_metadata = json.loads(segment_meta_text) if segment_meta_text.strip() else {}
 except Exception:
     segment_metadata = {}
     st.error("Metadata JSON parse error — using empty metadata.")
 
-# On generate
 if generate_btn:
-    # Pass the determined API key to the generator
     api_key_to_use = api_key if api_key else None
     
     with st.spinner("Generating advisory..."):
@@ -195,7 +179,6 @@ if generate_btn:
         )
 
     st.header("Generated Advisory")
-    # Use markdown for the response text to render any formatting from the LLM
     st.markdown(response_text)
 
     with st.expander("Show Full Prompt Sent to Model"):

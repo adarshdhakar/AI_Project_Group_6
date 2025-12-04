@@ -3,7 +3,6 @@ import random
 import numpy as np
 from collections import defaultdict
 
-# --- [Re-using your MDP Definitions for standalone execution] ---
 actions = ["ConfirmRoute", "SwitchRoute", "Wait", "CancelAndRebook"]
 
 def clamp_cost(cost):
@@ -11,7 +10,6 @@ def clamp_cost(cost):
     return min(levels, key=lambda x: abs(x - max(0, min(100, cost))))
 
 def get_transitions(state, action):
-    # (Simplified version of your logic for the simulation script)
     p, d, u, c = state
     if p == "ARRIVED": return [(1.0, state, 0)]
     if p == "CANCELLED": return [(1.0, state, 0)]
@@ -38,7 +36,7 @@ def get_transitions(state, action):
     elif action == "CancelAndRebook":
         T = [(1.0, ("NOT_STARTED", "NONE", "LOW", clamp_cost(c-40)), -30)]
     
-    return T if T else [(1.0, state, -50)] # Penalty for invalid moves
+    return T if T else [(1.0, state, -50)] 
 
 def step_env(state, action):
     outcomes = get_transitions(state, action)
@@ -46,7 +44,6 @@ def step_env(state, action):
     candidates = [o[1:] for o in outcomes]
     return candidates[np.random.choice(len(candidates), p=probs)]
 
-# --- [Training with History Tracking] ---
 def train_and_track():
     Q = defaultdict(float)
     epsilon = 1.0
@@ -57,7 +54,7 @@ def train_and_track():
     history_success = []
     history_rewards = []
     window = 100
-    recent_outcomes = [] # 1 for success, 0 for fail
+    recent_outcomes = [] 
     
     print("Training Agent...", end="")
     for ep in range(3000):
@@ -100,7 +97,6 @@ def train_and_track():
     print(" Done!")
     return Q, history_success
 
-# --- [Detailed Simulation Printer] ---
 def simulate_detailed_run(Q):
     print("\n" + "="*60)
     print("      DETAILED SIMULATION: AGENT IN ACTION")
@@ -114,11 +110,9 @@ def simulate_detailed_run(Q):
     
     total_reward = 0
     while not done and step_count < 20:
-        # Greedy Action
         q_vals = [Q[(state, a)] for a in actions]
         best_action = actions[np.argmax(q_vals)]
         
-        # Execute
         next_state, reward = step_env(state, best_action)
         
         print(f"{step_count:<5} | {str(state):<55} | {best_action:<15} | {reward}")
@@ -135,7 +129,6 @@ def simulate_detailed_run(Q):
             print(f"FINAL STATE: {state}")
             print(f"TOTAL REWARD: {total_reward}")
 
-# --- [Main] ---
 if __name__ == "__main__":
     # 1. Train and get history
     Q_table, success_rate_history = train_and_track()

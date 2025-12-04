@@ -19,7 +19,6 @@ class Action:
         self.noop = noop
         self.cost = cost
         self.duration = duration
-        # initial risk estimate: probability of disruption/failure (0..1)
         self.risk_estimate = risk_estimate
 
     def __repr__(self):
@@ -62,7 +61,6 @@ def inconsistent_effects(a, b):
 
 def interference(a, b):
     return bool((a.delete & a.pre) or (b.delete & a.pre) or (a.delete & b.pre) or (b.delete & a.pre))
-    # note: conservative but ok for this prototype
 
 def competing_needs(a, b, prev_literal_mutex):
     if not a.pre or not b.pre:
@@ -76,7 +74,6 @@ def competing_needs(a, b, prev_literal_mutex):
 def action_mutex(a, b, prev_literal_mutex):
     if inconsistent_effects(a, b):
         return True
-    # compute interference carefully: if a.delete intersects b.pre or vice-versa
     if (a.delete & b.pre) or (b.delete & a.pre):
         return True
     if competing_needs(a, b, prev_literal_mutex):
@@ -96,8 +93,8 @@ if "literal_levels" not in st.session_state:
     st.session_state.goal_reached = GOALS <= st.session_state.literal_levels[0]
 
     # Learning / disruption bookkeeping
-    st.session_state.action_stats = {a.name: {"trials": 1, "failures": int(a.risk_estimate*1)} for a in ACTIONS}  # small prior
-    st.session_state.failed_actions = set()  # temporarily unavailable actions (simulate disruptions)
+    st.session_state.action_stats = {a.name: {"trials": 1, "failures": int(a.risk_estimate*1)} for a in ACTIONS}  
+    st.session_state.failed_actions = set()  
 
 # ------------------------------
 # Expand one GraphPlan level
@@ -237,11 +234,8 @@ def extract_plan(level_index):
 
         def backtrack(idx, chosen_actions):
             if idx >= len(goals_list):
-                # chosen_actions is a set of action names (excluding INIT)
-                # verify actions are pairwise non-mutex in A_{k-1}
                 chosen_list = list(chosen_actions)
                 ok = True
-                # build action mutex set for A_{k-1}
                 amutex = st.session_state.mutex_action_levels[k-1]
                 for x, y in itertools.combinations(chosen_list, 2):
                     if (x, y) in amutex or (y, x) in amutex:
@@ -249,7 +243,6 @@ def extract_plan(level_index):
                         break
                 if not ok:
                     return None
-                # compute new goals = union of preconditions of chosen actions (INITs don't add)
                 new_goals = set()
                 for an in chosen_list:
                     if an == "INIT":
@@ -257,11 +250,9 @@ def extract_plan(level_index):
                     action_obj = action_names.get(an)
                     if action_obj:
                         new_goals |= set(action_obj.pre)
-                # recursion
                 subplan = extract(new_goals, k-1)
                 if subplan is None:
                     return None
-                # append chosen actions at level k-1 into subplan
                 out = dict(subplan)
                 out.setdefault(k-1, set())
                 out[k-1] |= set(x for x in chosen_list if x != "INIT")
@@ -269,13 +260,11 @@ def extract_plan(level_index):
 
             g = goals_list[idx]
             for cand in sorted(goal_candidates[g]):
-                # try choose cand for goal g
                 if cand == "INIT":
                     res = backtrack(idx+1, chosen_actions)
                     if res is not None:
                         return res
                 else:
-                    # add cand, but avoid duplicates
                     if cand in chosen_actions:
                         res = backtrack(idx+1, chosen_actions)
                         if res is not None:
@@ -292,14 +281,12 @@ def extract_plan(level_index):
         cache[key] = plan
         return plan
 
-    # start extraction from topmost level K where goals are present
     return extract(set(GOALS), K)
 
 # ------------------------------
 # Utilities: compute cost/duration and build readable plan ordering
 # ------------------------------
 def build_ordered_plan(plan_by_level):
-    # produce a list of actions in chronological order (by level increasing)
     ordered = []
     name_to_obj = {a.name: a for a in ACTIONS}
     for lvl in sorted(plan_by_level.keys()):
@@ -323,9 +310,8 @@ def simulate_disruption(action_name=None):
     Simulate running action_name (or random chosen action from planned sequence).
     Use action's current risk estimate to sample failure. Update action_stats and failed_actions if failure.
     """
-    # choose an action if not provided
+
     if not action_name:
-        # choose random non-noop action
         candidates = [a for a in ACTIONS if not a.noop]
         action_obj = random.choice(candidates)
     else:
@@ -337,11 +323,9 @@ def simulate_disruption(action_name=None):
     st.session_state.action_stats.setdefault(name, {"trials": 0, "failures": 0})
     st.session_state.action_stats[name]["trials"] += 1
 
-    # effective risk: combine static estimate with empirical (trials/failures smoothing)
     trials = st.session_state.action_stats[name]["trials"]
     failures = st.session_state.action_stats[name]["failures"]
     emp_risk = failures / trials if trials>0 else action_obj.risk_estimate
-    # simple blend: 0.6 empirical, 0.4 prior
     eff_risk = 0.6 * emp_risk + 0.4 * action_obj.risk_estimate
 
     failed = random.random() < eff_risk
@@ -353,12 +337,11 @@ def simulate_disruption(action_name=None):
         return {"result": "ok", "action": name, "eff_risk": eff_risk}
 
 def apply_learning_updates():
-    # update each in-memory action object's risk_estimate with smoothed empirical estimate
     for a in ACTIONS:
         stats = st.session_state.action_stats.get(a.name, None)
         if not stats:
             continue
-        # Laplace smoothing
+        
         trials = stats["trials"]
         failures = stats["failures"]
         a.risk_estimate = (failures + 1) / (trials + 2)  # smoothed
